@@ -34,9 +34,29 @@ pbd <- pb(nruns = 8,
 ```
 
 
-En el recuadro anterior observamos como generar un diseño plackett burman para 
+En el recuadro anterior observamos como generar un diseño plackett burman para 8 experimentos teniendo $8-1=7$ factores a evaluar dentro de los cuales tenemos como factores experimentales: 
 
+1. La masa de NaOH sólido
+2. El volumen de $H_2O_2\; 30\%$ 
+3. El volumen de agua
+4. El tiempo de digestión 
+5. El tiempo de rampa en la digestión
 
+De utilizar este diseño para la exploración los dos factores restantes serán factores 'dummy' en los cuales se tiene en cuenta el ruido experimental,
+
+Cuando los factores experimentales son mas de 4, es aconsejable utilizar un diseño de 12 experimentos, tal como lo hicieron vereda et al 2011 en donde variaban 6 factores en total. Para practicidad de este estudio preliminar podríamos eliminar el factor de volúmen de agua al mantenerlo constante en 2.5 mL siguiendo el procedimiento ya probado en el laboratorio y reportado en la literatura [saihua 2018](https://www.tandfonline.com/doi/abs/10.1080/00103624.2018.1435685). Gracias a esta exploración previa podemos generar el siguiente diseño:
+
+```{r}
+pbd2 <- pb(nruns = 8,
+          nfactors = 7, # 7 de los cuales 5 son exp y 2 son dummy
+          factor.names = c('masa NaOH',
+                           'vol. H2O2 30%',
+                                                  'tiempo digestion',
+                           'tiempo de rampa')
+          )
+```
+
+Al apostar por este diseño de 8 experimentos, el diseño generado es el mismo que un factorial fraccionado de resolución III ([Lawson 2014](https://books.google.com.co/books?hl=es&lr=&id=TOxMBgAAQBAJ&oi=fnd&pg=PP1&dq=+Design+and+Analysis+of+Experiments+with+R&ots=Ich1aW9m2h&sig=ajxtlGpbIBPtpf352E-8CKG1FoQ&redir_esc=y#v=onepage&q=Design%20and%20Analysis%20of%20Experiments%20with%20R&f=false), [Groemping 2020](https://www.rdocumentation.org/packages/FrF2/versions/2.2-2/topics/pb))
 
 
 
@@ -59,4 +79,12 @@ En el recuadro anterior observamos como generar un diseño plackett burman para
 * Alonso, E. V., de Torres, A. G., Cordero, M. S., & Pavón, J. C. (2011). Multivariate optimization of the synthesis and of the microwave dissolution of biomorphic silicon carbide ceramics. Microchemical Journal, 97(2), 101-108.
 
 * Plackett, R. L., & Burman, J. P. (1946). The design of optimum multifactorial experiments. Biometrika, 33(4), 305-325.
+
+* Saihua, L., Yunhe, X., Ji, X., Juan, H., Bocharnikova, E. A., & Matichenkov, V. V. (2018). Microwave digestion for colorimetric determination of total Si in plant and mineral samples. Communications in Soil Science and Plant Analysis, 49(7), 840-847.
+
+* Lawson, J. (2014). Design and Analysis of Experiments with R (Vol. 115). CRC press.
+
+* Groemping, U. (2014). R Package FrF2 for Creating and Analyzing Fractional Factorial 2-Level
+Designs. Journal of Statistical Software, 56, Issue 1, 1-56. http://www.jstatsoft.org/v56/
+i01/.
 

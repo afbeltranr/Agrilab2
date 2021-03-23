@@ -1,0 +1,10 @@
+"0","pbd2 <- pb(nruns = 8,"
+"0","          nfactors = 7, # 7 de los cuales 5 son exp y 2 son dummy"
+"0","          factor.names = c('masa NaOH',"
+"0","                           'vol. H2O2 30%',"
+"0","                                                  'tiempo digestion',"
+"0","                           'tiempo de rampa')"
+"0","          )"
+"2","Plackett-Burman designs in 8 runs coincide with regular fractional factorials. 
+          For screening more than four factors, you may want to consider increasing the number of runs to 12. 
+          Make sure to take the alias structure into account for interpretation!"

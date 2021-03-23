@@ -18,6 +18,99 @@
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+/* A workaround for https://github.com/jgm/pandoc/issues/4278 */
+a.sourceLine {
+  pointer-events: auto;
+}
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -56,12 +149,67 @@
 <li><p>Una evaluación preliminar, usando diseños factoriales de screening o exploración, con el objetivo de encontrar los factores (variables estudiadas) que tienen un efecto significativo en la variable de respuesta (porcentaje de recuperación del analito en la extracción).</p></li>
 <li><p>una estimación apropiada de la relación funcional real (función de respuesta) entre la respuesta analítica y los factores significativos, obteniendo de esta función los valores óptimos para cada respuesta.</p></li>
 </ol>
-<p><font size="4">Para encontrar los factores principales que afectan el procedimiento de digestión, es posible utilizar un diseño del tipo plackett burman (<a href="https://www.jstor.org/stable/2332195?seq=1Plackett%201946">Plackett 1946</a>) </font></p>
+<p><font size="4">Para encontrar los factores principales que afectan el procedimiento de digestión, es posible utilizar un diseño del tipo plackett burman (<a href="https://www.jstor.org/stable/2332195?seq=1Plackett%201946">Plackett 1946</a>).</p>
+<p>Para generar un diseño plackett-burman podemos utilizar la función <code>pb</code> presente en el paquete <code>FrF2</code> disponible en <a href="https://cran.r-project.org/web/packages/FrF2/index.html">CRAN</a></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(FrF2)</span></code></pre></div>
+<pre><code>## Loading required package: DoE.base</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## Loading required package: conf.design</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;DoE.base&#39;:
+##   method           from       
+##   factorize.factor conf.design</code></pre>
+<pre><code>## 
+## Attaching package: &#39;DoE.base&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     aov, lm</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     plot.design</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     lengths</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pbd <span class="ot">&lt;-</span> <span class="fu">pb</span>(<span class="at">nruns =</span> <span class="dv">8</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">nfactors =</span> <span class="dv">7</span>, <span class="co"># 7 de los cuales 5 son exp y 2 son dummy</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">factor.names =</span> <span class="fu">c</span>(<span class="st">&#39;masa NaOH&#39;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;vol. H2O2 30%&#39;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;vol H2O&#39;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;tiempo digestion&#39;</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;tiempo de rampa&#39;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>          )</span></code></pre></div>
+<pre><code>## Warning in pb(nruns = 8, nfactors = 7, factor.names = c(&quot;masa NaOH&quot;, &quot;vol. H2O2 30%&quot;, : Plackett-Burman designs in 8 runs coincide with regular fractional factorials. 
+##           For screening more than four factors, you may want to consider increasing the number of runs to 12. 
+##           Make sure to take the alias structure into account for interpretation!</code></pre>
+<p>En el recuadro anterior observamos como generar un diseño plackett burman para 8 experimentos teniendo <span class="math inline">\(8-1=7\)</span> factores a evaluar dentro de los cuales tenemos como factores experimentales:</p>
+<ol style="list-style-type: decimal">
+<li>La masa de NaOH sólido</li>
+<li>El volumen de <span class="math inline">\(H_2O_2\; 30\%\)</span></li>
+<li>El volumen de agua</li>
+<li>El tiempo de digestión</li>
+<li>El tiempo de rampa en la digestión</li>
+</ol>
+<p>De utilizar este diseño para la exploración los dos factores restantes serán factores ‘dummy’ en los cuales se tiene en cuenta el ruido experimental,</p>
+<p>Cuando los factores experimentales son mas de 4, es aconsejable utilizar un diseño de 12 experimentos, tal como lo hicieron vereda et al 2011 en donde variaban 6 factores en total. Para practicidad de este estudio preliminar podríamos eliminar el factor de volúmen de agua al mantenerlo constante en 2.5 mL siguiendo el procedimiento ya probado en el laboratorio y reportado en la literatura <a href="https://www.tandfonline.com/doi/abs/10.1080/00103624.2018.1435685">saihua 2018</a>. Gracias a esta exploración previa podemos generar el siguiente diseño:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pbd2 <span class="ot">&lt;-</span> <span class="fu">pb</span>(<span class="at">nruns =</span> <span class="dv">8</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">nfactors =</span> <span class="dv">7</span>, <span class="co"># 7 de los cuales 5 son exp y 2 son dummy</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">factor.names =</span> <span class="fu">c</span>(<span class="st">&#39;masa NaOH&#39;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;vol. H2O2 30%&#39;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                                  <span class="st">&#39;tiempo digestion&#39;</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&#39;tiempo de rampa&#39;</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          )</span></code></pre></div>
+<pre><code>## Warning in pb(nruns = 8, nfactors = 7, factor.names = c(&quot;masa NaOH&quot;, &quot;vol. H2O2 30%&quot;, : Plackett-Burman designs in 8 runs coincide with regular fractional factorials. 
+##           For screening more than four factors, you may want to consider increasing the number of runs to 12. 
+##           Make sure to take the alias structure into account for interpretation!</code></pre>
+<p>Al apostar por este diseño de 8 experimentos, el diseño generado es el mismo que un factorial fraccionado de resolución III (<a href="https://books.google.com.co/books?hl=es&amp;lr=&amp;id=TOxMBgAAQBAJ&amp;oi=fnd&amp;pg=PP1&amp;dq=+Design+and+Analysis+of+Experiments+with+R&amp;ots=Ich1aW9m2h&amp;sig=ajxtlGpbIBPtpf352E-8CKG1FoQ&amp;redir_esc=y#v=onepage&amp;q=Design%20and%20Analysis%20of%20Experiments%20with%20R&amp;f=false">Lawson 2014</a>, <a href="https://www.rdocumentation.org/packages/FrF2/versions/2.2-2/topics/pb">Groemping 2020</a>)</p>
+<p></font></p>
 <div id="bibliografía" class="section level1">
 <h1>Bibliografía</h1>
 <ul>
 <li><p>Alonso, E. V., de Torres, A. G., Cordero, M. S., &amp; Pavón, J. C. (2011). Multivariate optimization of the synthesis and of the microwave dissolution of biomorphic silicon carbide ceramics. Microchemical Journal, 97(2), 101-108.</p></li>
 <li><p>Plackett, R. L., &amp; Burman, J. P. (1946). The design of optimum multifactorial experiments. Biometrika, 33(4), 305-325.</p></li>
+<li><p>Saihua, L., Yunhe, X., Ji, X., Juan, H., Bocharnikova, E. A., &amp; Matichenkov, V. V. (2018). Microwave digestion for colorimetric determination of total Si in plant and mineral samples. Communications in Soil Science and Plant Analysis, 49(7), 840-847.</p></li>
+<li><p>Lawson, J. (2014). Design and Analysis of Experiments with R (Vol. 115). CRC press.</p></li>
+<li><p>Groemping, U. (2014). R Package FrF2 for Creating and Analyzing Fractional Factorial 2-Level Designs. Journal of Statistical Software, 56, Issue 1, 1-56. <a href="http://www.jstatsoft.org/v56/" class="uri">http://www.jstatsoft.org/v56/</a> i01/.</p></li>
 </ul>
 </div>
 </div><!-- /.entry-content -->
