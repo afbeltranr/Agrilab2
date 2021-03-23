@@ -1,0 +1,23 @@
+"0","summary(pbd2)"
+"1","Call:
+"
+"1","pb(nruns = 8, nfactors = 7, factor.names = c(""masa NaOH"", 
+"
+"1","    ""vol. H2O2 30%"", ""tiempo digestion"", ""tiempo de rampa""))
+"
+"1","
+"
+"1","Experimental design of type "
+"1"," "
+"1","pb"
+"1"," "
+"1","
+"
+"1","8"
+"1"," "
+"1"," runs
+"
+"1","
+"
+"1","Factor settings (scale ends):
+"
