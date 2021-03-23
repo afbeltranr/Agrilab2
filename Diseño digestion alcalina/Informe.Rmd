@@ -1,0 +1,55 @@
+---
+title: "Dieño experimental para digestión alcalina y determinación de silicio en matrices orgánicas, fertilizantes, suelos y matrices acuosas."
+author: "Andrés Felipe beltrán Rodríguez"
+date: "23/3/2021"
+output:
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+---
+
+En este documento se presenta la revisión de la teoría y aplicación de la metodología de superficie de respuesta aplicada a la digestión asistida por microondas para la disolución de silicio presentada anteriormente por 
+[Vereda Alonso et al, 2011](https://www.sciencedirect.com/science/article/pii/S0026265X10001505?casa_token=m6kQtVjTkDgAAAAA:kiW64tdFPyTTnxZYcmd78xT4qYLr7sai0NZl_Zl90w5fQfUlTEewSQ5cOMr8Q5h9Cd08DDSNkZE) En la cual se utiliza una aproximación secuencial del tipo:
+
+  1. Una evaluación preliminar, usando diseños factoriales de screening o exploración, con el objetivo de encontrar los factores (variables estudiadas) que tienen un efecto significativo en la variable de respuesta (porcentaje de recuperación del analito en la extracción).
+
+  2. una estimación apropiada de la relación funcional real (función de respuesta) entre la respuesta analítica y los factores significativos, obteniendo de esta función los valores óptimos para cada respuesta.
+
+<font size = 4>Para encontrar los factores principales que afectan el procedimiento de digestión, es posible utilizar un diseño del tipo plackett burman ([Plackett 1946](https://www.jstor.org/stable/2332195?seq=1Plackett 1946)). 
+
+
+Para generar un diseño plackett-burman podemos utilizar la función `pb` presente en el paquete `FrF2` disponible en [CRAN](https://cran.r-project.org/web/packages/FrF2/index.html)
+
+
+```{r}
+library(FrF2)
+pbd <- pb()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</font>
+
+
+
+
+
+
+ 
+# Bibliografía
+
+* Alonso, E. V., de Torres, A. G., Cordero, M. S., & Pavón, J. C. (2011). Multivariate optimization of the synthesis and of the microwave dissolution of biomorphic silicon carbide ceramics. Microchemical Journal, 97(2), 101-108.
+
+* Plackett, R. L., & Burman, J. P. (1946). The design of optimum multifactorial experiments. Biometrika, 33(4), 305-325.
+
