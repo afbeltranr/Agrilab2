@@ -1,0 +1,13 @@
+"0","library(car)"
+"2","Loading required package: carData
+"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"0","qqPlot(residuales, envelope = 0.95)"
+"1","[1]"
+"1"," 8"
+"1"," 9"
+"1","
+"

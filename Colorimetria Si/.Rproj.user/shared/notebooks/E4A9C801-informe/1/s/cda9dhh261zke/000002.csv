@@ -1,0 +1,6 @@
+"0","FD.MCR1 <- round(1.803807262,5)"
+"0","FD.MCR2 <- round(1.850335307,5)"
+"0","masas.muestras <- c(0, 0.101/FD.MCR1,	0.1027,	0.1001,	0.1023,	0,	0.1054,	0.1034/FD.MCR2,	0.1031,	0,	0.1010,	0.1011,	0.1025,	0.1113, NA, NA,0.101,0.1034"
+"0",")"
+"0","muestras$porc.SiO2 <- round(muestras$concentracion.sin.intercepto *(0.025*60.8*100)/(1000*28.09*masas.muestras), 4)"
+"0","muestras"

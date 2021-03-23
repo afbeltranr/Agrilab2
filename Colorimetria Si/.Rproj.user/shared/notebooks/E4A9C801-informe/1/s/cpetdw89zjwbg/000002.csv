@@ -1,0 +1,3 @@
+"0","muestras$concentracion.sin.intercepto <- round((muestras$absorbancia /modelo2$coefficients[2]),3)"
+"0","muestras $concentracion.con.intercepto <- round((muestras$absorbancia -modelo2$coefficients[1])/modelo2$coefficients[2],3)"
+"0","print(muestras)"

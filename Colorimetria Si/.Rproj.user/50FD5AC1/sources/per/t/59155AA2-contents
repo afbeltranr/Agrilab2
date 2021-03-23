@@ -1,0 +1,774 @@
+---
+title: "Cuantificación de Silicio mediante colorimetría y digestión alcalina en microondas"
+author: "Químico Andrés Felipe Beltrán rodríguez"
+date: "3 de marzo de 2021"
+output:     
+ prettydoc::html_pretty:
+    theme: hpstr
+    
+---
+
+# Materiales y métodos
+
+## digestión
+
+
+## preparación de la muestra
+
+# Resultados
+
+## Primera aproximación
+
+###Construcción de la curva
+
+Para los niveles de la curva de calibración se llevaron a cabo mediciones de absorbancia en $\lambda_{max} = 660\; nm$. Cada medición se realizó por triplicado con tres volúmenes de celda diferentes provenientes de la misma solución de calibración.
+
+
+
+```{r}
+C.curva <- c(0, 1,2,5,10,20,50,75,100) # Las concentraciones preparadas
+Abs.curva <- c(0.000,0.013,0.026,0.075, mean(0.179,0.123,0.140), 0.269, mean(0.623,0.628,0.625),mean(1.107,1.112,1.105),mean(1.215,1.213,1.219)) # Las absorbancias leídas, los valores que no son el resultado de un promedio tuvieron 3 réplicas iguales
+
+curva <- data.frame(Si.mg.L=C.curva, Absorbancia.u.a.=Abs.curva)
+print(curva)
+
+
+```
+
+A partir de los resultados experimentales, es posible crear un modelo de regresión lineal simple mediante la el uso de la función `lm()` :
+
+```{r}
+
+modelo <- lm( Absorbancia.u.a. ~ Si.mg.L , data = curva) # Se crea el modelo lineal mediante OLS (Ordinary Least Squares Regression)
+
+```
+Una vez creado el modelo, podemos revisar la distribución de los residuales y los parámetros de regresión mediante el uso de la función `summary()`:
+
+```{r}
+summary(modelo)
+```
+
+
+En la pantalla anterior se muestran los parámetros del modelo de regresión entre la absorbancia y la concentración de las muestras.
+
+También es posible graficar la línea de regresión junto con los datos experimentales:
+
+```{r}
+library(ggplot2)
+g <- ggplot(curva, aes(Si.mg.L, Absorbancia.u.a.))
+g + geom_point() + geom_smooth(method ="lm")
+```
+ 
+
+### Análisis de residuales para confirmar supuesto de homocedasticidad
+
+
+El primer elemento es un resumen de la distribución de los residuales, los cuales para cumplir el supuesto de homocedasticidad deben tener varianza constante y promedio cero. Al imprimir el objeto `modelo`, la distribución de los residuales se presenta como cuartiles, siendo el segundo cuartil la mediana, un estimador robusto del valor central de una ditribución.
+Es posible ver los cuartiles de una manera más gráfica mediante un gráfico boxplot:
+
+
+```{r}
+
+residuales <- modelo$residuals
+boxplot(residuales)
+abline(h = median(residuales), col = "red", lty = 2)
+median(residuales)
+
+```
+
+
+En el gráfico boxplot, se crea una caja cuyo límite inferior es el primer cuartil, es decir que dentro de esta distribución de resultados experimentales el 25% de los datos son menores al valor que corresponde al primer cuartil (-0.014577). Bajo la misma lógica se pueden evaluar los valores para la mediana (-0.014249) y el tercer cuartil (-0.002292). 
+
+La distancia entre el tercer y el primer cuartil, es llamada el rango inter-cuartil (QIR)
+
+\begin{align}
+IQR \; = \; Q_3 - Q_1
+\end{align}
+
+Los bigotes son dibujados de la forma:
+
+
+
+ el **bigote inferior** va desde el valor de la distribución mínimo que esté entre el primer cuartil menos 1.5 veces el rago inter-cuartil $Q_1 - 1.5IQR$ y el primer cuartil $Q_1$.
+ 
+el **bigote superior** va desde el valor de la distribución máximo que esté entre el tercer cuartil $Q_3$ y el tercer cuartil mas 1.5 veces el rago inter-cuartil $Q_3 + 1.5IQR$.
+  
+En el boxplot que corresponde a la distribución de el primer modelo de regresión, el rango intercuartil es tan pequeño que no hay valores dentro de los rangos establecidos para generar los bigotes. Esto indica que la distribución es estrecha y puede presentar curtosis, o peso en los extremos. Esto puede deberse a valores atípicos, los cuales son detectados al estar por fuera de los bigotes del boxplot. 
+
+Podemos generar un boxplot para una distribución normal para comparar cómo debería verse la distribución si fuese normal:
+
+
+```{r}
+set.seed(2)# para que los calculos de valores aleatorios sean reproducibles cada vez que se corra el código de este informe
+dist <- rnorm(9, mean=0 , sd= sd(residuales)) # 
+boxplot(dist)
+```
+
+
+En el gráfico boxplot para una muestra aleatoria de una  distribución normal con la misma desviación presentada por los residuales experimentales es posible observar como se dibujan los bigotes.
+
+
+Para confirmar la presencia de curtosis, pueden utilizarse herramientas gráficas, como los gráficos de densidad, y numéricas como el cálculo de momentos centrales para curtosis y oblicuidad.
+
+```{r}
+library(ggplot2)
+
+g <- qplot(residuales) 
+g + geom_density(alpha = 0.4,)
+```
+
+```{r}
+library(moments)
+kurtosis(residuales)
+```
+
+Los resultados del cálculo para el momento central de curtosis toman valores entre 0 e $\infty$. un valor mayor a 3 indica una distribución "punteaguda" (Henderson, 2005) o *leptocurtica* en la cual no se presentan hombros. El calculo del momento central de curtosis nos permite rechazar la hipótesis de que la dispersión de la distribución se debe a la presencia de hombros en la misma, y confirmar que se debe a datos atípicos.
+
+Para evaluar que tanto se desvía la distribución de la normalidad, es posible realizar un gráfico cuantil-cuantil, en el cual se comparan los cuantiles para una distribución normal, con los correspondientes a la distribución empírica experimental. Si la distribución se aproxima a la normalidad, los valores de los cuantiles deberían ser los mismos para la muestra experimental y para la distribución normal, entonces, al hacer un gráfico de dispersión de los cuantiles experimentales en función de los cuantiles teóricos, los puntos deben yacer sobre sobre una línea recta.
+
+```{r}
+library(car)
+qqPlot(residuales, envelope = 0.95)
+
+```
+
+De manera análoga a los resultados en el boxplot, hay una concentración de datos en un rango estrecho de la distribución, que yacen dentro del intervalo del 95% de confianza para la regresión entre los residuales experimentales y los teóricos. Los valores que yacen fuera del intervalo de confianza son valores atípicos. En este caso son los elementos 8 y 9 de la curva de calibración:
+
+```{r}
+curva[c(8,9),]
+```
+
+Estos niveles son los únicos niveles de la curva que tienen una absorbancia mayor a 1, y están por fuera del rango lineal de la absorbancia (Mayerhöfer 2020).
+
+### Pruebas de hipótesis para los estimadores de los parámetros de regresión 
+
+En la impresión del contenido del objeto `modelo`, R nos brinda los resultados de las pruebas de hipótesis para una regresión 
+
+#### Prueba t individual para los coeficientes intercepto y pendiente
+
+En la sección `coefficients` de la impresión del contenido del objeto `lm` se presentan los coeficientes de regresión para el intercepto y la pendiente. La fila titualda con el valor de  x, en este caso `Si.mg.L` corresponde a la pendiente. 
+ 
+```{r}
+summary(modelo)
+```
+
+Teniendo como ecuación de regresión: 
+
+\begin{align}
+\hat{y_i} = b_0 + bx_i
+\end{align}
+
+Y los residuales para cada nivel $i$ como:
+
+\begin{align}
+e_i = y_i - \hat{y_i} 
+\end{align}
+
+La aproximación de regresión simple, la cual minimiza la suma de los residuales al cuadrado o *Ordinary Least Squares Regression (OLS)*  tiene la ventaja de que podemos obtener una ecuación para el resultado de cada parámetro de regresión.
+
+Para la pendiente:
+
+
+\begin{align}
+b = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2} 
+
+\end{align}
+
+y para el intercepto: 
+
+\begin{align}
+
+b_0 = \bar{y} - b \cdot \bar{x}
+
+\end{align}
+
+De este modo se obtienen los parámetros  $b_0 = 0.0133425$ y $b = 0.0124046$. Con cada parámetro está asociado un error estándar. Este error estándar se utiliza para transformar el valor real a la escala de una distribución normal estándar, en la cual se hace la prueba de hipótesis. Para hallar el error estándar de cada parámetro de regresión es necesario obtener el error estandar de los residuales, una medida de la dispersión de los valores predichos respecto a los experimentales:
+
+
+\begin{align}
+S^2_e = \frac{1}{n-2} \sum_{i=1}^n ( y_i - \hat{y_i})^2 = \frac{1}{n-2} \sum_{i=1}^n e^2
+\end{align}                                                                                                                     
+En donde los grados de libertad son n-2 ya que estimamos dos parámetros del modelo. Para definir un intervalo de confianza en el nivel p para los parámetros, se necesitan los valores de t y el error estandar de cada parámetro:
+
+\begin{align}
+b_0 \pm t_{n-2;p} \cdot s(b_0)
+\end{align}
+
+\begin{align}
+b \pm t_{n-2;p} \cdot s(b)
+\end{align}
+
+Con los errores estándar de $b_0$ y $b$:
+
+\begin{align}
+
+s(b_0) = s_e \cdot \sqrt{ \frac{\sum_{i=1}^n x_i^2}{ n \sum_{i=1}^n (x_i - \bar{x})^2  }     }
+
+\end{align}
+
+
+\begin{align}
+
+s(b) =  \frac{s_e}{\sqrt{\sum_{i=1}^n (x_i - \bar{x})^2}}
+
+\end{align}
+
+Ya que R nos brinda al imprimir el contenido del modelo con `summary(modelo)` el resultado del cálculo de los errores estándar en la columna `Std. Error` y el valor de t calculado para la prueba de hipótesis en la columna `t value` podemos calcular los intervalos de confianza con un nivel de significancia de 0.05.
+
+
+```{r}
+Q <- qnorm(p=1-0.05/2)
+intervalo_intercepto  <- Q *0.0268986
+intervalo_pendiente <- Q*0.0005908
+print(round(c(modelo$coefficients[1],modelo$coefficients[2]),3))
+print(round(c(intervalo_intercepto,intervalo_pendiente),3))
+
+```
+
+De esta manera podemos reportar los parametros de regresión con intervalos de confianza : $b_0 =  0.015 \pm 0.053$ , $b =   0.013  \pm 0.001$. Para reportar de una manera correcta los parámetros del modelo de regresión, hace falta reportar el resultado de la prueba de hipótesis para la diferencia significativa de cero:
+
+ **Intercepto:** La probabilidad de que una diferencia de cero igual o superior a la obtenida en este exprimento se vuelva a presentar por casualidad, es $p=  0.605$, o una probabilidad del 60%. Lo cual indica que el intercepto **no** es significativamente diferente de cero y no es necesario para el análisis de regresión.
+ 
+  **Pendiente:** La probabilidad de que una diferencia de cero igual o superior a la obtenida en este exprimento se vuelva a presentar por casualidad, es $p=  1.1\cdot10^{-7}$, o una probabilidad del $1.1\cdot10^{-5}$%. Lo cual indica que la diferencia de cero se da por una relación causal entre los cambios de señal y los cambios de concentración. La pendiente **Sí** es significativamente diferente de cero y  es necesaria para el análisis de regresión.
+
+En este momento es posible presentar los resultados para los parámetros de regresión de una manera adecuada:  $b_0 =  0.015 \pm 0.053 \;(p=0.605)$,  $b =   0.013  \pm  0.001 \;(p=1.1\cdot 10^{-7})$.
+
+
+
+#### Representación de los datos por el modelo
+
+La representación de los datos experimentales por el modelo de regresión lineal se puede evaluar con el coeficiente de regresión $R^2$ de pearson, el cual R presenta por defecto como `Multiple R-squared`, ya que también se puede calcular para modelos con varias variables independientes. En este caso, en regresión bivariada es el mismo que el coeficiente de pearson, e indica el porcentaje de representación de los datos usados para construir el modelo por la ecuación obtenida. un $R^2 = 0.9854$ indica una representación del 98.54% de los datos experimentales:
+
+```{r}
+round(9*0.98)
+
+```
+
+Para esta regresión el modelo explica la totalidad de los datos utilizados para la construcción de la curva.
+A su vez, este resultado indica que el 98& de la variabilidad entre el modelo y los datos experimentales está dada por la variabilidad debida a la regresión (Ferreira 2007). 
+
+#### Prueba de significancia de la regresión
+
+La prueba de significancia de la regresión hace una prueba con las siguientes hipótesis:
+
+$H_0:$ La **Hipótesis nula** que hay que comprobar implica que todos los coeficientes de la regresión son iguales a cero.
+$H_1:$  La **Hipótesis alternativa** que se acepta cuando la nula es falsa, implica que al menos uno de los coeficientes es significativamente diferente de cero.
+
+Esta prueba se hace al calcular el valor de F, y se rechaza la hipótesis nula a un nivel de signigicancia $\alpha = 0,05$. con un valor de $p = 1.104e-07$ confirma la significancia de almenos uno de los coeficientes, en este caso la pendiente.
+  
+## Ajuste sin los niveles 75 mg Si /L y 100 mg Si / L de la curva
+
+
+### Construcción del modelo
+
+
+Debido a que se obtuvieron dos resultados de absorbancia mayores a 1:
+
+```{r}
+curva[c(9,8),]
+```
+
+Podemos revisar el comportamiento de la regresión restando estos dos puntos.
+
+```{r}
+curva2 <- curva[-c(8,9),]
+modelo2 <-  lm( Absorbancia.u.a. ~ Si.mg.L , data = curva2)
+summary(modelo2)
+```
+
+
+Observando la nueva línea de regresión y los datos expermientales:
+
+
+```{r}
+library(ggplot2)
+g <- ggplot(curva2, aes(Si.mg.L, Absorbancia.u.a.))
+g + geom_point() + geom_smooth(method ="lm")
+```
+
+### Análisis de residuales para confirmar supuesto de homocedasticidad
+
+Podemos realizar las mismas pruebas que para el primer modelo:
+
+```{r}
+
+residuales2 <- modelo2$residuals
+boxplot(residuales2)
+abline(h = median(residuales2), col = "red", lty = 2)
+median(residuales2)
+```
+
+En este caso observamos que hay solo un dato atípico y que es posible gracias a la distribución dibujar los bigotes.
+
+```{r}
+library(ggplot2)
+
+g <- qplot(residuales2) 
+g + geom_density(alpha = 0.4,)
+```
+
+
+En este caso el grafico de densidad nos presenta una oblicuidad hacia la derecha, la cual podemos confirmar calculando el momento central:
+
+```{r}
+library(moments)
+kurtosis(residuales2)
+skewness(residuales2)
+```
+
+En donde un valor de curtosis cercano a 3 indica que estamos más cerca de una distribución normal, con una oblicuidad positiva (cola hacia la derecha).
+
+Podemos revisar la variación de los residuales en fución de las predicciones de absorbancia:
+
+```{r}
+y.pred <- (curva2$Si.mg.L*modelo$coefficients[2]) + modelo$coefficients[1]
+
+residuales <- data.frame(residuales = modelo2$residuals, y.pred = y.pred)
+
+ggplot(residuales, aes(y.pred, residuales)) + geom_point()
+```
+
+Esta variación debería ser constante a lo largo de la variable predicha (absorbancia). en este gráfico de dispersión la variación aumenta a medida que aumenta la absorbancia, lo que indica que el error en x es significativo, contrario al supuesto de homocedasticidad.
+
+
+
+
+### Pruebas de parámetros de regresión
+Para reportar los coeficientes de la regresión con intervalos de confianza:
+
+```{r}
+Q <- qnorm(1-0.05/2)
+intervalo_intercepto2  <- 0.0103684*Q 
+intervalo_pendiente2 <-0.0004984*Q
+print(round(c(modelo2$coefficients[1],modelo2$coefficients[2]),3))
+print(round(c(intervalo_intercepto2,intervalo_pendiente2),3))
+```
+
+Teniendo de nuevo el resultado de que el intercepto $b_0 =  0.013 \pm  0.020 \; (p=0.255 )$ no es sigificativo para la regresión, y la pendiente $b =   0.012\pm  0.001 \; (p=1.95\cdot10^{-6} )$  si es significativa.
+
+De manera análoga al primer modelo se pueden evaluar los demás parámetros y pruebas de esta regresión.
+
+
+## Cuantificación de muestras problema
+
+Se realizó la cuantificación de silicio en los extractos de digestión alcalina asistida por microondas y en la dilución preparada de silicio soluble en las muestras AFM402 y AFM 12863 siendo estas tierras de diatomeas y un fertilizante de silicio soluble edapot respectivamente.
+
+En esta primera aproximación, hubo un error en la preparación de la curva de calibración, y la lectura de la absorbancia de las muestras fue realizada el  01/03/2021, mientras que la curva de calibración fue medida el 03/03/2021, la cual fue utilizada para construir los objetos `modelo` y `modelo2`.
+
+ Se guardan los nombres de las muestras y las absorbancias:
+
+```{r}
+nombres <- c("blanco procedimiento 1",
+             "MRC Dil 2-1",
+             "402-D50-1",
+             "402-D50-2",
+             "402-D50-3",
+             "blanco procedimiento 2",
+             "402-D50-3",
+             "MRC Dil 2-2",
+             "402-D50-4",
+             "blanco procedimiento 3",
+             "402-D50-5",
+             "402-D50-6",
+             "402-D50-7",
+             "402-D50-8",
+             "Si Soluble D10",
+             "Si Soluble D20",
+             "MRC-1",
+             "MRC-2")
+
+absorbancia <- c(0.048,0.237,0.124,0.120,0.062,0.048,0.106,0.271,0.159,0.046,0.117,0.179,0.134,0.132,0.847,0.472,0.432,0.447)
+
+```
+
+Se juntan los datos en un solo `data.frame` :
+
+```{r}
+muestras <- data.frame(muestra = nombres, absorbancia= absorbancia)
+muestras
+```
+
+Luego, utilizando los coeficientes de regresión hallamos las concentraciones en mg Si/L 
+
+```{r}
+muestras$concentracion.sin.intercepto <- round((muestras$absorbancia /modelo2$coefficients[2]),3)
+muestras $concentracion.con.intercepto <- round((muestras$absorbancia -modelo2$coefficients[1])/modelo2$coefficients[2],3)
+knitr::kable(muestras)
+```
+
+
+Posteriormente podemos convertir estas concentraciones a % p/p de $SiO_2$:
+
+* Primero, los extractos directos:
+
+```{r}
+
+FD.MCR1 <- round(1.803807262,5)
+FD.MCR2 <- round(1.850335307,5)
+masas.muestras <- c(0, 0.101/FD.MCR1,	0.1027,	0.1001,	0.1023,	0,	0.1054,	0.1034/FD.MCR2,	0.1031,	0,	0.1010,	0.1011,	0.1025,	0.1113, NA, NA,0.101,0.1034
+)
+
+muestras$porc.SiO2 <- round(muestras$concentracion.sin.intercepto *(0.025*60.8*100)/(1000*28.09*masas.muestras), 4)
+knitr::kable(muestras)
+
+```
+
+Luego, las diluciones volumetricas de la muestra de silicio soluble en agua:
+```{r}
+Vol.alic.D10.Si.Sol <- 1
+Vol.alic.D20.Si.Sol <- 0.5
+
+muestras$porc.SiO2[15] <- round(  muestras$concentracion.con.intercepto[15]*(0.01*250*1*60.8*100)/(Vol.alic.D10.Si.Sol*1000*28.09*1.0182)       ,4)
+
+muestras$porc.SiO2[16] <- round(  muestras$concentracion.con.intercepto[15]*(0.01*250*1*60.8*100)/(Vol.alic.D20.Si.Sol*1000*28.09*1.0182)       ,4)
+knitr::kable(muestras)
+```
+
+En la tabla anterior están los resultados en $\% \; SiO_2$:
+
+
+
+* Para la muestra **Muestra 402** podemos evaluar la distribución de los resultados de las réplicas, y verificar si podemos reportar el promedio como medida de tendencia central:
+
+```{r}
+m.402 <- muestras[c(3,4,5,7,9,11:14),5]
+boxplot(m.402)
+```
+
+En el gráfico de boxplot para los resultados en $%SiO_2$ se encuentran 3 datos atípicos, las réplicas 3, 4 y 6. al removerlas podemos evaluar de nuevo la distribución sin efectos de escala por datos atípicos:
+
+```{r}
+m.402.sin.atipicos <- m.402[c(3,4,6)]
+boxplot(m.402.sin.atipicos)
+```
+
+Una vez evaluamos la distribución de los resultados sin datos atípicos, desde el boxplot se puede inferir que la muestra tiene oblicuidad hacia la derecha, lo que hará que los valores de la media y la mediana difieran:
+
+
+```{r}
+summary(m.402.sin.atipicos)
+```
+
+Podemos confirmar la afirmación de oblicuidad negativa calculando el momento central de oblicuidad:
+
+```{r}
+library(moments)
+skewness(m.402.sin.atipicos)
+```
+
+El valor medio del porcentaje de $SiO_2$ para la muestra de tierra de diatomeas $0.402$ difiere del reportado en un 99.46% :
+
+
+```{r}
+error.diatomeas <- 
+  ((74.2-0.402)/74.2)*100
+error.diatomeas 
+```
+
+Esto debido a la alta concentración de silicio en la muestra, la cual generó en el extracto una precipitación en forma de gel, y que a no logró pasar a través del filtro en el proceso de extracción. Este resultado permite proponer evaluar el rango de concentraciones de silicio en las muestras a trabajar, en el cual se mantenga un sesgo debido a la pérdida por precipitación en lo mínimo posible. Lo anterior podría lograrse disminuyendo la concentración de muestra en el extracto, o aumentando los reactivos. Otras variables podrían evaluarse para optimizar el proceso de extracción mediante un diseño experimental, similar al utilizado por [Vereda Alonso 2011](https://www.sciencedirect.com/science/article/pii/S0026265X10001505?casa_token=br1l3MVpVT8AAAAA:TvxYwgTWWUMQE6yxN1Y-5_OahYRSzYUO7US0OVH48P9q5VdsLIjQh4vA5yCJU2E0irl6gKMm-cI) variando el tiempo de digestión, la temperatura de digestión y las proporciones $NaOH:muestra$ y $H_2O_2:muestra$.
+
+
+Para la muestra de silicio soluble se espera una concentración de ~ $28 \%$ 
+```{r}
+tabla.Si.Soluble <- data.frame(muestra = muestras$muestra[c(15,16)], SiO2 = muestras[c(15,16),5])
+tabla.Si.Soluble
+```
+
+Valores que incluso en dilución, son extremadamente altos comparado a lo esperado, Lo cual puede deberse a la toma de una muestra no representativa del producto, y una dilución mayor a la adecuada en el momento de preparar el extracto. 
+
+
+Para el **material de referencia certificado** de roca fosfórica marroquí, el cual reporta un porcentaje en masa de $SiO_2$ de $2.01\%$.
+  
+```{r}
+
+tabla.MRC <- data.frame(muestra = muestras$muestra[c(2,8,17,18)],
+                        SiO2 = muestras[c(2,8,17,18),5])     
+tabla.MRC$Error <- round(abs(((tabla.MRC$SiO2-2.01)/2.01)*100),3)
+tabla.MRC
+```
+
+En la tabla anterior se presentan los resultados de la determinación del contenido de silicio en el material de referencia certificado de roca fosfórica, junto con el porcentaje de recuperación para cada réplica, en los cuales el máximo porcentaje de error relativo es $8.14\%$. El comportamiento de los resultados para el material de referencia, soporta las afirmaciones sobre los resultados de las muestras de tierra de diatomeas y de silicio soluble, sobre un mayor efecto del proceso de extracción en el sesgo los resultados, y no del método de cuantificación. 
+
+
+
+# Experimento 05/03/2021 Extractos paz de río - comité de silicio
+
+En este experimento se analizaron un conjunto de extractos con ácido acético 0,514 M nombradas de la forma: **B** (Blanco), **E** (Extracto), **EA** (Extracto con adición de silicio) ,**BA** (Blanco con adición de silicio), las cuales se analizaron por duplicado para tener en cuenta el error de las diluciones volumétricas.
+
+```{r}
+blanco.curva <- 0.01
+concentraciones <- c(1,2,5,10,20,50,100)
+absorbancias <- c(mean(0.016,0.013,0.016),
+                  mean(0.021,0.020,0.020),
+                  mean(0.039,0.041,0.043),
+                  mean(0.083,0.085,0.085),
+                  mean(0.160,0.0160,0.0156),
+                  mean(0.391,0.392,0.390),
+                  mean(0.694,0.695,0.696)
+                  )
+absorbancias <- absorbancias - blanco.curva
+
+
+curva3 <- data.frame(Si.mg.L = concentraciones, absorbancia.u.a.=absorbancias)
+```
+
+
+```{r}
+modelo.05.03.2021 <- lm(absorbancia.u.a.~Si.mg.L , data = curva3)
+summary(modelo.05.03.2021)
+```
+
+```{r}
+Q <- qnorm(1-0.05/2)
+intervalo_intercepto3 <- Q* 0.0078207
+intervalo_pendiente3 <- Q* 0.0001813
+print(round(c(0.0037170 ,0.0069573 ),3))
+print(round(c(intervalo_intercepto3,intervalo_pendiente3),4))
+```
+
+
+
+
+Para este modelo, el intercepto, $b_0 =  0.004 \pm 0.0153 \;(p =  0.655 )$ **no** es significativamente diferente de cero, mientras que la pendiente $b = 0.007 \pm  0.0004 \; (p = 2.26 \cdot 10^{-7})$ **sí** es significativamente diferente de cero.
+
+```{r}
+library(ggplot2)
+g <- ggplot(curva3, aes(Si.mg.L,absorbancia.u.a.))
+g + geom_smooth(method = "lm") + geom_point()
+```
+
+
+```{r}
+residuales3 <- modelo.05.03.2021$residuals
+boxplot(residuales3)
+abline(h = median(residuales3), col = "red", lty = 2)
+median(residuales3)
+```
+
+
+```{r}
+library(ggplot2)
+
+g <- qplot(residuales3) 
+g + geom_density(alpha = 0.4,)
+```
+
+```{r}
+library(moments)
+kurtosis(residuales3)
+skewness(residuales3)
+```
+
+```{r}
+
+muestras2 <- c("B7",
+              "B7-2",
+              "AFM-09722",
+              "AFM-09722-2",
+              "B.A.7",
+              "B.A.7-2",
+              "E7",
+              "E7-2",
+              "E.A.7",
+              "E.A.7-2")
+
+Abs.muestras <- c(mean(0.032,0.030,0.026),
+                  mean(0.030,0.030,0.027),
+                  mean(0.079,0.085,0.073),
+                  mean(0.080,0.083,0.078),
+                  mean(0.133,0.127,0.131),
+                  mean(0.131,0.124,0.124),
+                  mean(0.267,0.275,0.278),
+                  mean(0.288,0.273,0.285),
+                  mean(0.348,0.342,0.432),
+                  mean(0.353,0.354,0.350))
+
+muestras2.1 <- data.frame(Muestra = muestras2, Absorbanciau.a. = Abs.muestras)
+muestras2.1$C.sin.intercepto <- muestras2.1$Absorbanciau.a./modelo.05.03.2021$coefficients[2]
+muestras2.1$C.con.intercepto <- (muestras2.1$Absorbanciau.a.- modelo.05.03.2021$coefficients[1])/modelo.05.03.2021$coefficients[2]
+print(muestras2.1)
+```
+
+
+La tabla anterior presenta una concentración de Silicio en el blanco de 4.07 mg Si/L para la primera replica y 3.78 mg Si/L para la segunda réplica. Esto se atribuye al contacto de los extractos con material de vidrio durante el proceso de extracción, efecto que se minimizará en el siguiente experimento sin material de vidrio.
+
+# Cambio en el proceso de extracción "08/03/2021"
+
+
+El día 08 de marzo de 2021 se preparó la colorimetría para el conjunto de muestras analizado en la sección anterior cambiando el recipiente de vidrio en la etapa de extracción por recipíentes de plástico para evitar la señal del blanco de procedimiento.
+
+Se prepararon soluciones a partir de la curva de calibración para detectar la señal asociada a silicio en $\lambda_{máx}= 660\; nm$ mediante el espectrofotómetro pharo 300.
+
+
+```{r}
+ConcentracionesC.4 <- c(0,1,2,5,10,20,50,100)
+Abs.H2O.HPLC <- c(0.012,0.09,0.013)
+AbsorbanciasC.4 <- c(mean(0.05,-0.06,0.04),
+                     mean(0.006,0.011,0.008),
+                     mean(0.023,0.022,0.024),
+                     mean(0.052,0.056,0.057),
+                     mean(0.097,0.099,0.098),
+                     mean(0.169,0.167,0.169),
+                     mean(0.364,0.369,0.366),
+                     mean(0.703,0.701,0.705))
+curva4 <- data.frame(Si.mg.L = ConcentracionesC.4, Absorbancia.u.a. = AbsorbanciasC.4)
+
+```
+
+```{r}
+modelo4 <- lm(Absorbancia.u.a. ~ Si.mg.L, data = curva4)
+intercepto4 <- modelo4$coefficients[1]
+pendiente4 <- modelo4$coefficients[2]
+summary(modelo4)
+```
+
+
+```{r}
+boxplot(modelo4$residuals)
+```
+
+```{r}
+y.pred4 <- (curva4$Si.mg.L*modelo4$coefficients[2]) + modelo4$coefficients[1]
+
+residuales4 <- data.frame(residuales = modelo4$residuals, y.pred = y.pred4)
+
+ggplot(residuales4, aes(y.pred, residuales)) + geom_point()
+```
+
+
+```{r}
+intervalo_intercepto4 <-  0.007185*Q
+intervalo_pendiente4 <-  0.000178*Q
+print(round(c(0.022664 ,0.006823),3))
+print(round(c(intervalo_intercepto4,intervalo_pendiente4),4))
+```
+
+```{r}
+library(ggplot2)
+g <- ggplot(curva4, aes(Si.mg.L,Absorbancia.u.a.))
+g + geom_smooth(method = 'lm') + geom_point()
+```
+
+
+Mediante el análisis de regresión se obtienen los parámetros $b_0 = 0.023 \pm0.0141 (p= 0.0197)$ y  $b = 0.007 \pm 0.0003 (p=  2.11e-08)$
+
+
+En paralelo se prepararon las soluciones correspondientes a las muestras suministradas por el área de fertilizantes junto a tres controles analíticos, y una nueva preparación de la muestra de silicio soluble **edapot AFM 12863**, la cual fue preparada pesando 2.0144g y llevando a un volumen de 100 mL. A partir de el extracto se preparó una dilución 100, tomando 1 mL de extracto y llevandolo a un volúmen final de 100 mL. La dilución final fue seleccionada para la determinación de Si en solución mediante colorimetría:
+
+
+```{r}
+muestras4 <- data.frame(Muestra = c("Control 1.mg.L",
+                                    "Control 20.mg.L",
+                                    "Control 100.mg.L",
+                                    "Blanco.A.A.1",
+                                    "E.A.1",
+                                    "E.A.1 + Silicio",
+                                    "E.Est Silicio 1",
+                                    "AFM 9722 - 1",
+                                    "AFM 9722 - 2",
+                                    "AFM 12863 D100"
+                                    )
+                        )
+muestras4$Absorbancia.u.a. <- c(mean(0.016,0.018,0.020),
+                                mean(0.163,0.153,0.165),
+                                mean(0.707,0.696,0.703),
+                                mean(0.015,0.016,0.014),
+                                mean(0.211,0.200,0.199),
+                                mean(0.219,0.220,0.230),
+                                mean(0.143,0.141,0.146),
+                                mean(0.010,0.017,0.016),
+                                mean(0.008,0.024,0.025),
+                                mean(0.213,0.212,0.209)) 
+
+muestras4$Si.mg.L.Con.Intercepto <- (muestras4$Absorbancia.u.a - intercepto4) / pendiente4
+muestras4$Si.mg.L.Sin.Intercepto <- (muestras4$Absorbancia.u.a) / pendiente4
+muestras4$Si.mg.L.Con.Intercepto <- round(muestras4$Si.mg.L.Con.Intercepto,2)
+muestras4$Si.mg.L.Sin.Intercepto <- round(muestras4$Si.mg.L.Sin.Intercepto,2)
+
+muestras4$SiO2 <- rep(NA, 10) 
+muestras4$SiO2[10] <-round((27.90*60.08*100*0.1*100)/(1000*28.09*2.0144),2)
+
+```
+
+```{r}
+knitr::kable(muestras4)
+```
+
+Mediante los resultados podemos evaluar la exactitud del método mediante el porcentaje de recuperación de las adiciones realizadas, la adición del blanco fue de $16,02 \;mg/L$ y la de el extracto paz de rio de $15,80\;mg/L$ 
+
+
+```{r}
+muestras4$recuperacion <- rep(NA,10)
+muestras4$recuperacion[6] <- ((muestras4$Si.mg.L.Con.Intercepto[6]- muestras4$Si.mg.L.Con.Intercepto[5])/15.80)*100
+
+muestras4$recuperacion[7] <- ((muestras4$Si.mg.L.Con.Intercepto[7]- muestras4$Si.mg.L.Con.Intercepto[4])/16.02)*100
+```
+
+Podemos también calcular la recuperación para la determinación de las adiciones mediante absorción atómica:
+
+
+
+```{r}
+Muestra.PZR.AA <- 25.90
+blanco.AA <- -5.58
+Muestra.PZR.Ad <- 30.65
+blanco.AA.Ad  <- 16.64
+```
+
+
+```{r}
+recuperaciones <- data.frame(muestra = c('Blanco + Si','muestra Paz de Rio + Si'),
+                             recuperacion.A.A. = c(  (blanco.AA.Ad - blanco.AA)/15.80*100  , (Muestra.PZR.Ad - Muestra.PZR.AA)/15.80*100 ),
+                             recuperacion.UV = round(c(muestras4[7,5],muestras4[6,5]),3)
+                             
+                             )
+knitr::kable(recuperaciones)
+```
+
+En la tabla anterior se presentan los porcentajes de recuperación de las adiciones de silicio, resultados que permiten evidenciar que la señal es mayor que la esperada en los blanco mediante anmbas técnicas espectrofotométricas, y a su vez la muestra de paz de río presenta una señal menor a la esperada en ambas técnicas espectrofotométricas. Lo cual indica un posible efecto matriz de la muestra paz de río, lo cual puede evidenciarse en la técnica colorimétrica cuando hay presencia de fósforo y hierro(Govett 1961).
+
+
+Respecto a la muestra de silicio soluble *Edapot  AFM 12863* podemos obtener el porcentaje expresado como $\% SiO_2$:
+```{r}
+muestras4$SiO2[10]
+```
+
+
+
+Podemos observar las concentraciones y absorbancias de las muestras en la curva de calibración:
+
+```{r}
+library(ggplot2)
+g <- ggplot(curva4, aes(Si.mg.L,Absorbancia.u.a.))
+
+g + geom_smooth(method = 'lm') + geom_point() + geom_point(aes(Si.mg.L.Con.Intercepto,Absorbancia.u.a.), data = muestras4, colour = 'red')
+
+```
+
+Debido a la alta dispersión en las respuestas de la curva de calibración a bajas concentraciones, existen predicciones para concentraciones negativas. 
+
+
+# Conclusiones
+
+* Debido a la ausencia de una varianza constante en los residuales de las curvas de calibración, es aconsejable realizar diluciones gravimétricas para evitar el error en x. 
+* Las mediciones a bajas concentraciones en el espectrofotómetro pharo 300 presentan una alta dispersión, por lo que es posible proponer una comparación de mediciones entre espectrofotómetros con el hach.
+
+* Es aconsejable estudiar el efecto matriz con la combinación de calibración externa, adición de estándar, y calibración de youden (Castells 2000).
+ 
+# Referencias
+
+* Saihua, L., Yunhe, X., Ji, X., Juan, H., Bocharnikova, E. A., & Matichenkov, V. V. (2018). Microwave digestion for colorimetric determination of total Si in plant and mineral samples. Communications in Soil Science and Plant Analysis, 49(7), 840-847.
+
+* Henderson, A. R. (2006). Testing experimental data for univariate normality. Clinica chimica acta, 366(1-2), 112-129.
+
+* Miller, J. N. (1991). Basic statistical methods for analytical chemistry. Part 2. Calibration and regression methods. A review. Analyst, 116(1), 3-14.
+
+* Mayerhöfer, T. G., Pahlow, S., & Popp, J. (2020). The Bouguer‐Beer‐Lambert law: Shining light on the obscure. ChemPhysChem. doi:10.1002/cphc.202000464
+
+* Alonso, E. V., de Torres, A. G., Cordero, M. S., & Pavón, J. C. (2011). Multivariate optimization of the synthesis and of the microwave dissolution of biomorphic silicon carbide ceramics. Microchemical Journal, 97(2), 101-108.
+
+* Ferreira, S. L. C., Bruns, R. E., da Silva, E. G. P., Dos Santos, W. N. L., Quintella, C. M., David, J. M., ... & Neto, B. B. (2007). Statistical designs and response surface techniques for the optimization of chromatographic systems. Journal of chromatography A, 1158(1-2), 2-14.
+
+* Castells, R. C., & Castillo, M. A. (2000). Systematic errors: detection and correction by means of standard calibration, Youden calibration and standard additions method in conjunction with a method response model. Analytica chimica acta, 423(2), 179-185.
+
+* •	Govett, G. J. S. (1961). Critical factors in the colorimetric determination of silica. Analytica Chimica Acta, 25(1), 69-80.

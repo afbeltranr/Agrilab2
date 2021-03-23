@@ -1,0 +1,1 @@
+"0","abline(h = median(residuales3), col = ""red"", lty = 2)"

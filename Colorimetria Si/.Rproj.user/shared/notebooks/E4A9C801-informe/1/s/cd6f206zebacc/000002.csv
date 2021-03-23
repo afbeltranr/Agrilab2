@@ -1,0 +1,4 @@
+"0","tabla.MRC <- data.frame(muestra = muestras$muestra[c(2,8,17,18)],"
+"0","                        SiO2 = muestras[c(2,8,17,18),5])     "
+"0","tabla.MRC$Error <- round(abs(((tabla.MRC$SiO2-2.01)/2.01)*100),3)"
+"0","tabla.MRC"

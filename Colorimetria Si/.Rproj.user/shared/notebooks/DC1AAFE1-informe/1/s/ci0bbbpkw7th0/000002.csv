@@ -1,0 +1,4 @@
+"0","muestras4$recuperacion <- rep(NA,10)"
+"0","muestras4$recuperacion[6] <- ((muestras4$Si.mg.L.Con.Intercepto[6]- muestras4$Si.mg.L.Con.Intercepto[5])/15.80)*100"
+"0",""
+"0","muestras4$recuperacion[7] <- ((muestras4$Si.mg.L.Con.Intercepto[7]- muestras4$Si.mg.L.Con.Intercepto[4])/16.02)*100"

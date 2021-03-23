@@ -1,0 +1,2 @@
+"0","tabla.Si.Soluble <- data.frame(muestra = muestras$muestra[c(15,16)], SiO2 = muestras[c(15,16),5])"
+"0","tabla.Si.Soluble"

@@ -1,0 +1,3 @@
+"0","library(ggplot2)"
+"0","g <- qplot(residuales2) "
+"0","g + geom_density(alpha = 0.4,)"

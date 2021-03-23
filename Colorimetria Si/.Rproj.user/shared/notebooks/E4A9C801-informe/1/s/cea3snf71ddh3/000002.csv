@@ -1,0 +1,2 @@
+"0","residuales2 <- modelo2$residuals"
+"0","boxplot(residuales2)"

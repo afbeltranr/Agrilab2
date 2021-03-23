@@ -1,0 +1,6 @@
+"0","recuperaciones <- data.frame(muestra = c('Blanco','muestra Paz de Rio'),"
+"0","                             recuperacion.A.A. = c(  (blanco.AA.Ad - blanco.AA)/15.80*100  , (Muestra.PZR.Ad - Muestra.PZR.AA)/15.80*100 ),"
+"0","                             recuperacion.UV = round(c(muestras4[7,5],muestras4[6,5]),3)"
+"0","                             "
+"0","                             )"
+"0","recuperaciones"

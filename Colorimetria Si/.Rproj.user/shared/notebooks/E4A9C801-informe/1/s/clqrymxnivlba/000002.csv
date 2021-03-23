@@ -1,0 +1,3 @@
+"0","library(ggplot2)"
+"0","g <- ggplot(curva2, aes(Si.mg.L, Absorbancia.u.a.))"
+"0","g + geom_point() + geom_smooth(method =""lm"")"
