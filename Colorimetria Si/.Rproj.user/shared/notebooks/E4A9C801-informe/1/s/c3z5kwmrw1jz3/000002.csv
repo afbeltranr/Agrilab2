@@ -1,4 +1,0 @@
-"0","C.curva <- c(0, 1,2,5,10,20,50,75,100) # Las concentraciones preparadas"
-"0","Abs.curva <- c(0.000,0.013,0.026,0.075, mean(0.179,0.123,0.140), 0.269, mean(0.623,0.628,0.625),mean(1.107,1.112,1.105),mean(1.215,1.213,1.219)) # Las absorbancias leídas, los valores que no son el resultado de un promedio tuvieron 3 réplicas iguales"
-"0","curva <- data.frame(Si.mg.L=C.curva, Absorbancia.u.a.=Abs.curva)"
-"0","print(curva)"

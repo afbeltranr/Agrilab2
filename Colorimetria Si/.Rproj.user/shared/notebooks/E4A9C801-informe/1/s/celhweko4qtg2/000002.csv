@@ -1,2 +1,0 @@
-"0","###----------------------------Curva de calibración y cuantificación"
-"0","modelo <- lm( Absorbancia.u.a. ~ Si.mg.L , data = curva) # Se crea el modelo lineal mediante OLS (Ordinary Least Squares Regression)"

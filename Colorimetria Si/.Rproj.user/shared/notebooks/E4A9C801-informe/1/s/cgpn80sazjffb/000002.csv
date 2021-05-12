@@ -1,3 +1,0 @@
-"0","set.seed(2)# para que los calculos de valores aleatorios sean reproducibles cada vez que se corra el código de este informe"
-"0","dist <- rnorm(9, mean=0 , sd= sd(residuales)) # "
-"0","boxplot(dist)"
